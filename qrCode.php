@@ -23,36 +23,33 @@ class QrCode
 		$white = imagecolorallocate( $background, 255, 255, 255);
 		imagefilledrectangle( $background, 0, 0, $backSize, $backSize, $white );
 
-		imagecopyresampled ( $background, $logo, $borderSize, $borderSize, 0, 0, $logoSize, $logoSize, imagesx( $logo ), imagesy( $logo ) );
-		imagedestroy ( $logo );
+		imagecopyresampled( $background, $logo, $borderSize, $borderSize, 0, 0, $logoSize, $logoSize, imagesx( $logo ), imagesy( $logo ) );
+		imagedestroy( $logo );
 		
 		// Конечное лого добавляем в QR-код
 		imagecopyresampled( $this->qrImage, $background, $backSize, $backSize, 0, 0, $backSize, $backSize, $backSize, $backSize );
 	}
 
-	public function createQrCode ( $content, $size, $logo )
+	public function createQrCode ( $content, $logo, $size = '256x256' )
 	{
 
 		$this->qrImage = imagecreatefrompng( 'https://chart.googleapis.com/chart?cht=qr&chld=H|1&chs=' . $size . '&chl=' . urlencode( $content ) );
 
 		if ( !empty( $logo ) )
 		{
-			$this->addLogo ( $logo, mb_strlen( $content ) );
+			$this->addLogo( $logo, mb_strlen( $content ) );
 		}
-		
-		header('Content-type: image/png');
+
+		//header('Content-type: image/png');
 		imagepng( $this->qrImage );
 		imagedestroy( $this->qrImage );
-		return TRUE;
+		unset( $this->qrImage );
 	}
 }
 
-/*	Main section	*/
+$content = is_null( $_GET['content'] ) ? 'https://youtu.be/dQw4w9WgXcQ' : $_GET['content'];
+$size = is_null( $_GET['size'] ) ? '256x256' : $_GET['size'];
+$logo = is_null( $_GET['logo'] ) ? 'https://styles.redditmedia.com/t5_2qhk5/styles/communityIcon_v58lvj23zo551.jpg' : $_GET['logo'];
 
 $QR = new QrCode();
-$content = is_null( $_GET['content'] ) ? 'https://youtu.be/dQw4w9WgXcQ' : $_GET['content'];
-$size = is_null( $_GET['size'] ) ? '250x250' : $_GET['size'];
-$logo = is_null( $_GET['logo'] ) ? 'https://styles.redditmedia.com/t5_2qhk5/styles/communityIcon_v58lvj23zo551.jpg' : $_GET['logo'];
-$QR->createQrCode( $content, $size, $logo )
-
-?>
+$QR->createQrCode( $content, $logo, $size );
